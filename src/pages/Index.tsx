@@ -33,9 +33,9 @@ const Index = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
+      <div className="min-h-screen flex w-full bg-white">
         <AppSidebar activeView={activeView} onViewChange={setActiveView} />
-        <main className="flex-1 p-6 bg-gradient-to-br from-red-50 to-white">
+        <main className="flex-1 p-8 bg-white">
           <div className="max-w-7xl mx-auto">
             {renderActiveView()}
           </div>

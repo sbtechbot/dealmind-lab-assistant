@@ -32,35 +32,39 @@ export function AppSidebar({ activeView, onViewChange }: AppSidebarProps) {
   const collapsed = state === "collapsed";
 
   return (
-    <Sidebar className={collapsed ? "w-14" : "w-64"} collapsible="icon">
-      <div className="p-4 border-b border-red-200">
-        <div className="flex items-center gap-2">
-          <Brain className="h-6 w-6 text-primary" />
+    <Sidebar className={collapsed ? "w-16" : "w-80"} collapsible="icon">
+      <div className="p-6 border-b-2 border-primary bg-white">
+        <div className="flex items-center gap-3">
+          <Brain className="h-8 w-8 text-primary" />
           {!collapsed && (
             <div>
-              <h1 className="font-bold text-lg text-primary">DealMind Lab</h1>
-              <p className="text-sm text-muted-foreground">AI Negotiation Training</p>
+              <h1 className="font-bold text-xl text-primary">DealMind Lab</h1>
+              <p className="text-base text-muted-foreground">AI Negotiation Training</p>
             </div>
           )}
         </div>
       </div>
 
-      <SidebarContent>
+      <SidebarContent className="bg-white">
         <SidebarGroup>
-          <SidebarGroupLabel>Tools</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-lg font-semibold text-primary px-6 py-4">Tools</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="space-y-2 px-4">
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton
                     onClick={() => onViewChange(item.id)}
-                    className={activeView === item.id ? "bg-primary/10 text-primary border-l-4 border-primary" : "hover:bg-red-50"}
+                    className={`${
+                      activeView === item.id 
+                        ? "bg-primary text-white border-l-4 border-primary shadow-lg" 
+                        : "hover:bg-primary/10 hover:border-l-4 hover:border-primary/50"
+                    } p-4 rounded-lg transition-all duration-200 min-h-[4rem]`}
                   >
-                    <item.icon className="h-4 w-4" />
+                    <item.icon className="h-6 w-6 flex-shrink-0" />
                     {!collapsed && (
-                      <div className="flex flex-col items-start">
-                        <span className="text-sm font-medium">{item.title}</span>
-                        <span className="text-xs text-muted-foreground">{item.description}</span>
+                      <div className="flex flex-col items-start ml-3 flex-1">
+                        <span className="text-base font-semibold">{item.title}</span>
+                        <span className="text-sm opacity-80">{item.description}</span>
                       </div>
                     )}
                   </SidebarMenuButton>
@@ -71,8 +75,8 @@ export function AppSidebar({ activeView, onViewChange }: AppSidebarProps) {
         </SidebarGroup>
       </SidebarContent>
       
-      <div className="p-2">
-        <SidebarTrigger />
+      <div className="p-4 border-t-2 border-primary bg-white">
+        <SidebarTrigger className="w-full p-3 rounded-lg border-2 border-primary text-primary hover:bg-primary hover:text-white transition-colors" />
       </div>
     </Sidebar>
   );
