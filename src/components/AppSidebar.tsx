@@ -1,5 +1,5 @@
 
-import { Database, MessageSquare, FileText, Download, Bot, Brain } from "lucide-react";
+import { Database, MessageSquare, FileText, Download, Bot, Brain, Cpu } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -21,22 +21,24 @@ interface AppSidebarProps {
 const menuItems = [
   { id: "dataset", title: "Dataset Manager", icon: Database, description: "Create & manage training data" },
   { id: "simulator", title: "Chat Simulator", icon: MessageSquare, description: "Live negotiation simulation" },
+  { id: "training", title: "Model Training", icon: Cpu, description: "Train AI models" },
   { id: "prompts", title: "Prompt Manager", icon: FileText, description: "System prompts & few-shot examples" },
   { id: "export", title: "Export Center", icon: Download, description: "Generate training datasets" },
   { id: "models", title: "Model Integration", icon: Bot, description: "Connect AI models" },
 ];
 
 export function AppSidebar({ activeView, onViewChange }: AppSidebarProps) {
-  const { collapsed } = useSidebar();
+  const { state } = useSidebar();
+  const collapsed = state === "collapsed";
 
   return (
-    <Sidebar className={collapsed ? "w-14" : "w-64"} collapsible>
-      <div className="p-4 border-b">
+    <Sidebar className={collapsed ? "w-14" : "w-64"} collapsible="icon">
+      <div className="p-4 border-b border-red-200">
         <div className="flex items-center gap-2">
           <Brain className="h-6 w-6 text-primary" />
           {!collapsed && (
             <div>
-              <h1 className="font-bold text-lg">DealMind Lab</h1>
+              <h1 className="font-bold text-lg text-primary">DealMind Lab</h1>
               <p className="text-sm text-muted-foreground">AI Negotiation Training</p>
             </div>
           )}
@@ -52,7 +54,7 @@ export function AppSidebar({ activeView, onViewChange }: AppSidebarProps) {
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton
                     onClick={() => onViewChange(item.id)}
-                    className={activeView === item.id ? "bg-primary/10 text-primary" : ""}
+                    className={activeView === item.id ? "bg-primary/10 text-primary border-l-4 border-primary" : "hover:bg-red-50"}
                   >
                     <item.icon className="h-4 w-4" />
                     {!collapsed && (

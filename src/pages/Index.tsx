@@ -3,6 +3,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { DatasetManager } from "@/components/DatasetManager";
 import { ConversationSimulator } from "@/components/ConversationSimulator";
+import { ModelTraining } from "@/components/ModelTraining";
 import { PromptManager } from "@/components/PromptManager";
 import { ExportCenter } from "@/components/ExportCenter";
 import { ModelIntegration } from "@/components/ModelIntegration";
@@ -17,6 +18,8 @@ const Index = () => {
         return <DatasetManager />;
       case "simulator":
         return <ConversationSimulator />;
+      case "training":
+        return <ModelTraining />;
       case "prompts":
         return <PromptManager />;
       case "export":
@@ -32,7 +35,7 @@ const Index = () => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
         <AppSidebar activeView={activeView} onViewChange={setActiveView} />
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-6 bg-gradient-to-br from-red-50 to-white">
           <div className="max-w-7xl mx-auto">
             {renderActiveView()}
           </div>
