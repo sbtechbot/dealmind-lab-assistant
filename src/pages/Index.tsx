@@ -1,13 +1,44 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/AppSidebar";
+import { DatasetManager } from "@/components/DatasetManager";
+import { ConversationSimulator } from "@/components/ConversationSimulator";
+import { PromptManager } from "@/components/PromptManager";
+import { ExportCenter } from "@/components/ExportCenter";
+import { ModelIntegration } from "@/components/ModelIntegration";
+import { useState } from "react";
 
 const Index = () => {
+  const [activeView, setActiveView] = useState("dataset");
+
+  const renderActiveView = () => {
+    switch (activeView) {
+      case "dataset":
+        return <DatasetManager />;
+      case "simulator":
+        return <ConversationSimulator />;
+      case "prompts":
+        return <PromptManager />;
+      case "export":
+        return <ExportCenter />;
+      case "models":
+        return <ModelIntegration />;
+      default:
+        return <DatasetManager />;
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-background">
+        <AppSidebar activeView={activeView} onViewChange={setActiveView} />
+        <main className="flex-1 p-6">
+          <div className="max-w-7xl mx-auto">
+            {renderActiveView()}
+          </div>
+        </main>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 
