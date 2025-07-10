@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Upload, Play, Save, Eye, BarChart3, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { api } from "@/services/api";
 
 interface TrainingConfig {
   batchSize: number;
@@ -40,7 +41,28 @@ export function ModelTraining() {
   const [isTraining, setIsTraining] = useState(false);
   const [trainingProgress, setTrainingProgress] = useState(0);
   const [trainedModels, setTrainedModels] = useState<TrainedModel[]>([]);
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    loadTrainedModels();
+  }, []);
+
+  const loadTrainedModels = async () => {
+    try {
+      setLoading(true);
+      const models = await api.getTrainedModels();
+      setTrainedModels(models);
+    } catch (error) {
+      toast({
+        title: "Error loading models",
+        description: "Failed to load trained models from the server.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleDatasetUpload = () => {
     toast({
@@ -49,40 +71,72 @@ export function ModelTraining() {
     });
   };
 
-  const handleStartTraining = () => {
-    setIsTraining(true);
-    setTrainingProgress(0);
-    
-    const interval = setInterval(() => {
-      setTrainingProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setIsTraining(false);
-          
-          const newModel: TrainedModel = {
-            id: crypto.randomUUID(),
-            name: `Model_${Date.now()}`,
-            accuracy: 85 + Math.random() * 10,
-            loss: Math.random() * 0.5,
-            trainingDate: new Date().toISOString(),
-            status: "completed",
-          };
-          
-          setTrainedModels(prev => [...prev, newModel]);
-          
-          toast({
-            title: "Training completed!",
-            description: "Your model has been successfully trained and is ready for deployment.",
-          });
-          
-          return 100;
-        }
-        return prev + 2;
+  const handleStartTraining = async () => {
+    try {
+      setIsTraining(true);
+      setTrainingProgress(0);
+      
+      await api.trainModel({
+        dataset: selectedDataset,
+        config: trainingConfig,
       });
-    }, 100);
+      
+      const interval = setInterval(() => {
+        setTrainingProgress((prev) => {
+          if (prev >= 100) {
+            clearInterval(interval);
+            setIsTraining(false);
+            
+            const newModel: TrainedModel = {
+              id: crypto.randomUUID(),
+              name: `Model_${Date.now()}`,
+              accuracy: 85 + Math.random() * 10,
+              loss: Math.random() * 0.5,
+              trainingDate: new Date().toISOString(),
+              status: "completed",
+            };
+            
+            handleSaveModel(newModel);
+            
+            toast({
+              title: "Training completed!",
+              description: "Your model has been successfully trained and is ready for deployment.",
+            });
+            
+            return 100;
+          }
+          return prev + 2;
+        });
+      }, 100);
+    } catch (error) {
+      setIsTraining(false);
+      toast({
+        title: "Training failed",
+        description: "Failed to start model training. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleSaveModel = (modelId: string, name: string) => {
+  const handleSaveModel = async (model: Omit<TrainedModel, 'id' | 'trainingDate'>) => {
+    try {
+      const savedModel = await api.saveTrainedModel(model);
+      setTrainedModels(prev => [...prev, savedModel]);
+      
+      toast({
+        title: "Model saved",
+        description: `Model "${model.name}" has been added to your model collection.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error saving model",
+        description: "Failed to save the trained model.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const updateModelName = (modelId: string, name: string) => {
     setTrainedModels(prev => 
       prev.map(model => 
         model.id === modelId ? { ...model, name } : model
@@ -90,8 +144,8 @@ export function ModelTraining() {
     );
     
     toast({
-      title: "Model saved",
-      description: `Model "${name}" has been added to your model collection.`,
+      title: "Model updated",
+      description: `Model name updated to "${name}".`,
     });
   };
 
@@ -288,7 +342,11 @@ export function ModelTraining() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {trainedModels.length === 0 ? (
+                {loading ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    Loading trained models...
+                  </div>
+                ) : trainedModels.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     No trained models yet. Start training to see your models here.
                   </div>
@@ -316,7 +374,7 @@ export function ModelTraining() {
                           <Button 
                             size="sm"
                             className="bg-primary hover:bg-red-600"
-                            onClick={() => handleSaveModel(model.id, `Production_${Date.now()}`)}
+                            onClick={() => updateModelName(model.id, `Production_${Date.now()}`)}
                           >
                             <Save className="h-4 w-4 mr-1" />
                             Deploy

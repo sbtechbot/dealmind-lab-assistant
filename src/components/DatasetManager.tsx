@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,10 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Search, Edit, Trash2, Star, Upload, Tag, Save, Eye, FileJson, FileSpreadsheet, TableProperties } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { api } from "@/services/api";
 
 interface ConversationEntry {
   id: string;
@@ -50,27 +52,33 @@ export function DatasetManager() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<ConversationEntry | null>(null);
-  
-  // New state for table-based data entry
   const [isTableEntryMode, setIsTableEntryMode] = useState(false);
   const [tableHeaders, setTableHeaders] = useState<TableHeader[]>([]);
   const [tableEntries, setTableEntries] = useState<TableEntry[]>([]);
   const [isDefiningHeaders, setIsDefiningHeaders] = useState(false);
+  const [loading, setLoading] = useState(false);
   
   const { toast } = useToast();
 
-  // Load entries from localStorage on mount
   useEffect(() => {
-    const savedEntries = localStorage.getItem("dealMindEntries");
-    if (savedEntries) {
-      setEntries(JSON.parse(savedEntries));
-    }
+    loadConversations();
   }, []);
 
-  // Save entries to localStorage whenever entries change
-  useEffect(() => {
-    localStorage.setItem("dealMindEntries", JSON.stringify(entries));
-  }, [entries]);
+  const loadConversations = async () => {
+    try {
+      setLoading(true);
+      const data = await api.getConversations();
+      setEntries(data);
+    } catch (error) {
+      toast({
+        title: "Error loading conversations",
+        description: "Failed to load conversations from the server.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const createNewEntry = () => {
     const newEntry: ConversationEntry = {
@@ -143,7 +151,6 @@ export function DatasetManager() {
     }
     setIsDefiningHeaders(false);
     setIsTableEntryMode(true);
-    // Initialize with one empty row
     setTableEntries([{ id: crypto.randomUUID(), data: {} }]);
   };
 
@@ -163,7 +170,7 @@ export function DatasetManager() {
     setTableEntries(prev => prev.filter(entry => entry.id !== entryId));
   };
 
-  const saveTableData = () => {
+  const saveTableData = async () => {
     const validEntries = tableEntries.filter(entry => 
       Object.values(entry.data).some(value => value && value.toString().trim())
     );
@@ -177,59 +184,108 @@ export function DatasetManager() {
       return;
     }
 
-    // Save to localStorage or your preferred storage
-    localStorage.setItem("tableData", JSON.stringify({
-      headers: tableHeaders,
-      entries: validEntries,
-      createdAt: new Date().toISOString(),
-    }));
+    try {
+      await api.saveTableData({
+        headers: tableHeaders,
+        entries: validEntries,
+      });
 
-    toast({
-      title: "Data saved successfully",
-      description: `${validEntries.length} entries have been saved to your dataset.`,
-    });
+      toast({
+        title: "Data saved successfully",
+        description: `${validEntries.length} entries have been saved to your dataset.`,
+      });
 
-    // Reset the table entry mode
-    setIsTableEntryMode(false);
-    setIsDefiningHeaders(false);
-    setTableHeaders([]);
-    setTableEntries([]);
-  };
-
-  const viewAllData = () => {
-    // This would show all created datasets
-    toast({
-      title: "Data Center",
-      description: "Opening data center view...",
-    });
-  };
-
-  const saveEntry = (entry: ConversationEntry) => {
-    if (entries.find(e => e.id === entry.id)) {
-      setEntries(prev => prev.map(e => e.id === entry.id ? entry : e));
-    } else {
-      setEntries(prev => [...prev, entry]);
+      setIsTableEntryMode(false);
+      setIsDefiningHeaders(false);
+      setTableHeaders([]);
+      setTableEntries([]);
+    } catch (error) {
+      toast({
+        title: "Error saving data",
+        description: "Failed to save table data to the server.",
+        variant: "destructive",
+      });
     }
-    toast({
-      title: "Entry saved",
-      description: "Conversation entry has been saved successfully.",
-    });
-    setIsCreateDialogOpen(false);
-    setEditingEntry(null);
   };
 
-  const deleteEntry = (id: string) => {
-    setEntries(prev => prev.filter(e => e.id !== id));
-    toast({
-      title: "Entry deleted",
-      description: "Conversation entry has been removed.",
-    });
+  const viewAllData = async () => {
+    try {
+      const conversationsData = await api.exportData('conversations');
+      const tableData = await api.exportData('table_data');
+      
+      toast({
+        title: "Data Center",
+        description: "Data exported successfully. Check your Downloads folder.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error exporting data",
+        description: "Failed to export data from the server.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const toggleFavorite = (id: string) => {
-    setEntries(prev => prev.map(e => 
-      e.id === id ? { ...e, is_favorite: !e.is_favorite } : e
-    ));
+  const saveEntry = async (entry: ConversationEntry) => {
+    try {
+      if (entries.find(e => e.id === entry.id)) {
+        await api.updateConversation(entry.id, entry);
+        setEntries(prev => prev.map(e => e.id === entry.id ? entry : e));
+      } else {
+        const { id, created_at, ...entryData } = entry;
+        const savedEntry = await api.createConversation(entryData);
+        setEntries(prev => [...prev, savedEntry]);
+      }
+      
+      toast({
+        title: "Entry saved",
+        description: "Conversation entry has been saved successfully.",
+      });
+      setIsCreateDialogOpen(false);
+      setEditingEntry(null);
+    } catch (error) {
+      toast({
+        title: "Error saving entry",
+        description: "Failed to save conversation entry.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const deleteEntry = async (id: string) => {
+    try {
+      await api.deleteConversation(id);
+      setEntries(prev => prev.filter(e => e.id !== id));
+      toast({
+        title: "Entry deleted",
+        description: "Conversation entry has been removed.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error deleting entry",
+        description: "Failed to delete conversation entry.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const toggleFavorite = async (id: string) => {
+    const entry = entries.find(e => e.id === id);
+    if (entry) {
+      const updatedEntry = { ...entry, is_favorite: !entry.is_favorite };
+      try {
+        await api.updateConversation(id, updatedEntry);
+        setEntries(prev => prev.map(e => 
+          e.id === id ? updatedEntry : e
+        ));
+      } catch (error) {
+        toast({
+          title: "Error updating entry",
+          description: "Failed to update favorite status.",
+          variant: "destructive",
+        });
+      }
+    }
   };
 
   const filteredEntries = entries.filter(entry => {
@@ -241,6 +297,14 @@ export function DatasetManager() {
   });
 
   const allTags = Array.from(new Set(entries.flatMap(e => e.metadata.tags)));
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-lg">Loading conversations...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -276,8 +340,7 @@ export function DatasetManager() {
           <TabsTrigger value="data-center" className="data-[state=active]:bg-primary data-[state=active]:text-white">Data Center</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="entries" className="space-y-4">
-          
+        <TabsContent value="entries" className="space-y-4">          
           <div className="flex gap-4 items-center">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
