@@ -33,38 +33,48 @@ export function AppSidebar({ activeView, onViewChange }: AppSidebarProps) {
 
   return (
     <Sidebar className={collapsed ? "w-16" : "w-80"} collapsible="icon">
-      <div className="p-6 border-b-2 border-primary bg-white">
+      <div className="p-6 border-b border-border bg-gradient-to-r from-primary/5 to-primary/10">
         <div className="flex items-center gap-3">
-          <Brain className="h-8 w-8 text-primary" />
+          <div className="p-2 rounded-lg bg-primary/10">
+            <Brain className="h-6 w-6 text-primary" />
+          </div>
           {!collapsed && (
-            <div>
+            <div className="animate-fade-in">
               <h1 className="font-bold text-xl text-primary">DealMind Lab</h1>
-              <p className="text-base text-muted-foreground">AI Negotiation Training</p>
+              <p className="text-sm text-muted-foreground">AI Negotiation Training</p>
             </div>
           )}
         </div>
       </div>
 
-      <SidebarContent className="bg-white">
+      <SidebarContent className="bg-background">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-lg font-semibold text-primary px-6 py-4">Tools</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-base font-semibold text-primary px-6 py-4 uppercase tracking-wide">
+            Tools
+          </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-2 px-4">
+            <SidebarMenu className="space-y-1 px-4">
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton
                     onClick={() => onViewChange(item.id)}
                     className={`${
                       activeView === item.id 
-                        ? "bg-primary text-white border-l-4 border-primary shadow-lg" 
-                        : "hover:bg-primary/10 hover:border-l-4 hover:border-primary/50"
-                    } p-4 rounded-lg transition-all duration-200 min-h-[4rem]`}
+                        ? "bg-primary text-primary-foreground shadow-lg border-l-4 border-primary scale-105" 
+                        : "hover:bg-primary/10 hover:border-l-4 hover:border-primary/30 hover:scale-102"
+                    } p-4 rounded-lg transition-all duration-200 ease-out min-h-[4rem] group card-hover`}
                   >
-                    <item.icon className="h-6 w-6 flex-shrink-0" />
+                    <div className={`p-2 rounded-md ${
+                      activeView === item.id 
+                        ? "bg-primary-foreground/20" 
+                        : "bg-primary/10 group-hover:bg-primary/20"
+                    } transition-colors duration-200`}>
+                      <item.icon className="h-5 w-5 flex-shrink-0" />
+                    </div>
                     {!collapsed && (
                       <div className="flex flex-col items-start ml-3 flex-1">
-                        <span className="text-base font-semibold">{item.title}</span>
-                        <span className="text-sm opacity-80">{item.description}</span>
+                        <span className="text-sm font-semibold leading-tight">{item.title}</span>
+                        <span className="text-xs opacity-80 mt-1 leading-tight">{item.description}</span>
                       </div>
                     )}
                   </SidebarMenuButton>
@@ -75,8 +85,8 @@ export function AppSidebar({ activeView, onViewChange }: AppSidebarProps) {
         </SidebarGroup>
       </SidebarContent>
       
-      <div className="p-4 border-t-2 border-primary bg-white">
-        <SidebarTrigger className="w-full p-3 rounded-lg border-2 border-primary text-primary hover:bg-primary hover:text-white transition-colors" />
+      <div className="p-4 border-t border-border bg-gradient-to-r from-primary/5 to-primary/10">
+        <SidebarTrigger className="w-full p-3 rounded-lg border border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-200 font-medium shadow-sm hover:shadow-md" />
       </div>
     </Sidebar>
   );
