@@ -59,21 +59,21 @@ const Index = () => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gradient-to-br from-background to-primary/5">
         <AppSidebar activeView={activeView} onViewChange={setActiveView} />
-        <main className="flex-1 flex flex-col">
+        <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* Header */}
-          <header className="bg-background/80 backdrop-blur-sm border-b border-border p-6 shadow-sm">
-            <div className="max-w-7xl mx-auto">
+          <header className="bg-background/80 backdrop-blur-sm border-b border-border px-4 py-4 shadow-sm flex-shrink-0">
+            <div className="max-w-full">
               <div className="animate-fade-in">
-                <h1 className="text-2xl font-bold text-foreground mb-2">{getViewTitle()}</h1>
-                <p className="text-muted-foreground text-sm">{getViewDescription()}</p>
+                <h1 className="text-xl font-bold text-foreground mb-1 truncate">{getViewTitle()}</h1>
+                <p className="text-muted-foreground text-sm truncate">{getViewDescription()}</p>
               </div>
             </div>
           </header>
 
           {/* Content Area */}
-          <div className="flex-1 p-6 overflow-auto">
-            <div className="max-w-7xl mx-auto animate-slide-up">
-              <div className="bg-card rounded-xl shadow-sm border border-border p-6 min-h-[calc(100vh-12rem)]">
+          <div className="flex-1 p-4 overflow-auto">
+            <div className="max-w-full animate-slide-up">
+              <div className="bg-card rounded-lg shadow-sm border border-border p-4 min-h-[calc(100vh-8rem)] max-w-full overflow-hidden">
                 {renderActiveView()}
               </div>
             </div>

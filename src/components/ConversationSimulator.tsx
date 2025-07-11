@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -141,63 +142,64 @@ export function ConversationSimulator() {
   };
 
   return (
-    <div className="space-y-8 bg-white">
-      <div className="flex items-center justify-between bg-white p-6 rounded-xl border-2 border-primary">
-        <div>
-          <h1 className="text-4xl font-bold text-primary flex items-center gap-3">
-            <MessageSquare className="h-10 w-10" />
-            Conversation Simulator
+    <div className="space-y-4 w-full max-w-full">
+      {/* Compact Header */}
+      <div className="flex items-center justify-between bg-white p-4 rounded-lg border border-primary">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
+            <MessageSquare className="h-6 w-6 flex-shrink-0" />
+            <span className="truncate">Conversation Simulator</span>
           </h1>
-          <p className="text-lg text-muted-foreground mt-2">Live negotiation simulation with AI models</p>
+          <p className="text-sm text-muted-foreground mt-1 truncate">Live negotiation simulation with AI models</p>
         </div>
-        <div className="flex gap-3">
-          <Button variant="outline" onClick={resetSession} className="gap-2 h-12 px-6 text-base border-2 border-primary hover:bg-primary hover:text-white">
-            <RotateCcw className="h-5 w-5" />
-            Reset
+        <div className="flex gap-2 flex-shrink-0">
+          <Button variant="outline" onClick={resetSession} className="gap-2 h-10 px-4 text-sm border border-primary hover:bg-primary hover:text-white">
+            <RotateCcw className="h-4 w-4" />
+            <span className="hidden sm:inline">Reset</span>
           </Button>
-          <Button onClick={saveSession} className="gap-2 h-12 px-6 text-base bg-primary hover:bg-primary/90">
-            <Save className="h-5 w-5" />
-            Save Session
+          <Button onClick={saveSession} className="gap-2 h-10 px-4 text-sm bg-primary hover:bg-primary/90">
+            <Save className="h-4 w-4" />
+            <span className="hidden sm:inline">Save</span>
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Configuration Panel */}
-        <Card className="lg:col-span-1 border-2 border-primary">
-          <CardHeader className="bg-primary/5">
-            <CardTitle className="text-xl text-primary flex items-center gap-2">
-              <Sparkles className="h-5 w-5" />
-              Simulation Setup
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+        {/* Compact Configuration Panel */}
+        <Card className="lg:col-span-1 border border-primary">
+          <CardHeader className="bg-primary/5 p-4">
+            <CardTitle className="text-lg text-primary flex items-center gap-2">
+              <Sparkles className="h-4 w-4" />
+              Setup
             </CardTitle>
-            <CardDescription className="text-base">Configure your negotiation scenario</CardDescription>
+            <CardDescription className="text-sm">Configure your scenario</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6 p-6">
+          <CardContent className="space-y-4 p-4">
             <div>
-              <Label htmlFor="title" className="text-base font-semibold">Session Title</Label>
+              <Label htmlFor="title" className="text-sm font-medium">Session Title</Label>
               <Input
                 id="title"
                 value={currentSession.title}
                 onChange={(e) => setCurrentSession(prev => ({ ...prev, title: e.target.value }))}
                 placeholder="Electronics negotiation..."
-                className="mt-2 h-12 text-base border-2 border-primary/30 focus:border-primary"
+                className="mt-1 h-9 text-sm border border-primary/30 focus:border-primary"
               />
             </div>
 
             <div>
-              <Label htmlFor="scenario" className="text-base font-semibold">Scenario Context</Label>
+              <Label htmlFor="scenario" className="text-sm font-medium">Scenario Context</Label>
               <Textarea
                 id="scenario"
                 value={currentSession.scenario}
                 onChange={(e) => setCurrentSession(prev => ({ ...prev, scenario: e.target.value }))}
                 placeholder="Customer wants to buy a laptop but finds the price too high..."
-                rows={4}
-                className="mt-2 text-base border-2 border-primary/30 focus:border-primary"
+                rows={3}
+                className="mt-1 text-sm border border-primary/30 focus:border-primary"
               />
             </div>
 
             <div>
-              <Label className="text-base font-semibold">Intent</Label>
+              <Label className="text-sm font-medium">Intent</Label>
               <Select
                 value={currentSession.metadata.intent}
                 onValueChange={(value) => setCurrentSession(prev => ({
@@ -205,7 +207,7 @@ export function ConversationSimulator() {
                   metadata: { ...prev.metadata, intent: value }
                 }))}
               >
-                <SelectTrigger className="mt-2 h-12 text-base border-2 border-primary/30">
+                <SelectTrigger className="mt-1 h-9 text-sm border border-primary/30">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -218,7 +220,7 @@ export function ConversationSimulator() {
             </div>
 
             <div>
-              <Label className="text-base font-semibold">Business Type</Label>
+              <Label className="text-sm font-medium">Business Type</Label>
               <Select
                 value={currentSession.metadata.business_type}
                 onValueChange={(value) => setCurrentSession(prev => ({
@@ -226,7 +228,7 @@ export function ConversationSimulator() {
                   metadata: { ...prev.metadata, business_type: value }
                 }))}
               >
-                <SelectTrigger className="mt-2 h-12 text-base border-2 border-primary/30">
+                <SelectTrigger className="mt-1 h-9 text-sm border border-primary/30">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -238,10 +240,10 @@ export function ConversationSimulator() {
               </Select>
             </div>
 
-            <div className="flex items-center justify-between p-4 bg-primary/5 rounded-lg border border-primary/20">
-              <div className="flex items-center gap-3">
-                <Label className="text-base font-semibold">Mode:</Label>
-                <Badge variant={isManualMode ? "default" : "secondary"} className="text-sm px-3 py-1">
+            <div className="flex items-center justify-between p-3 bg-primary/5 rounded-lg border border-primary/20">
+              <div className="flex items-center gap-2">
+                <Label className="text-sm font-medium">Mode:</Label>
+                <Badge variant={isManualMode ? "default" : "secondary"} className="text-xs px-2 py-1">
                   {isManualMode ? "Manual" : "AI Auto"}
                 </Badge>
               </div>
@@ -250,49 +252,49 @@ export function ConversationSimulator() {
                 size="sm"
                 onClick={() => setIsManualMode(!isManualMode)}
                 disabled={!isManualMode}
-                className="border-primary hover:bg-primary hover:text-white"
+                className="h-8 w-8 p-0 border-primary hover:bg-primary hover:text-white"
               >
-                <Zap className="h-4 w-4" />
+                <Zap className="h-3 w-3" />
               </Button>
             </div>
           </CardContent>
         </Card>
 
-        {/* Chat Interface */}
-        <Card className="lg:col-span-3 border-2 border-primary">
-          <CardHeader className="bg-primary/5">
-            <CardTitle className="flex items-center gap-3 text-xl text-primary">
-              <MessageSquare className="h-6 w-6" />
+        {/* Compact Chat Interface */}
+        <Card className="lg:col-span-3 border border-primary">
+          <CardHeader className="bg-primary/5 p-4">
+            <CardTitle className="flex items-center gap-2 text-lg text-primary">
+              <MessageSquare className="h-5 w-5" />
               Live Simulation
             </CardTitle>
-            <CardDescription className="text-base">
+            <CardDescription className="text-sm">
               {currentSession.messages.length} messages • {currentSession.metadata.business_type}
             </CardDescription>
           </CardHeader>
-          <CardContent className="p-6">
-            <div className="space-y-6">
-              {/* Chat Messages */}
-              <ScrollArea className="h-96 border-2 border-primary/20 rounded-xl p-6 bg-white">
-                <div className="space-y-6">
+          <CardContent className="p-4">
+            <div className="space-y-4">
+              {/* Compact Chat Messages */}
+              <ScrollArea className="h-80 border border-primary/20 rounded-lg p-4 bg-white">
+                <div className="space-y-4">
                   {currentSession.messages.length === 0 ? (
-                    <div className="text-center text-muted-foreground py-12">
-                      <Bot className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <p className="text-lg">Start your negotiation simulation...</p>
+                    <div className="text-center text-muted-foreground py-8">
+                      <Bot className="h-8 w-8 mx-auto mb-3 opacity-50" />
+                      <p className="text-sm">Start your negotiation simulation...</p>
                     </div>
                   ) : (
                     currentSession.messages.map((message) => (
-                      <div key={message.id} className="flex gap-4">
-                        <Avatar className="h-10 w-10 border-2 border-primary">
+                      <div key={message.id} className="flex gap-3">
+                        <Avatar className="h-8 w-8 border border-primary flex-shrink-0">
                           <AvatarFallback className={message.role === "user" ? "bg-primary/10" : "bg-primary text-white"}>
-                            {message.role === "user" ? <User className="h-5 w-5" /> : <Bot className="h-5 w-5" />}
+                            {message.role === "user" ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
                           </AvatarFallback>
                         </Avatar>
-                        <div className="flex-1 space-y-3">
-                          <div className="flex items-center gap-3">
-                            <span className="font-semibold text-base">
+                        <div className="flex-1 space-y-2 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-sm">
                               {message.role === "user" ? "Customer" : "Assistant"}
                             </span>
-                            <span className="text-sm text-muted-foreground flex items-center gap-1">
+                            <span className="text-xs text-muted-foreground flex items-center gap-1">
                               <Clock className="h-3 w-3" />
                               {new Date(message.timestamp).toLocaleTimeString()}
                             </span>
@@ -302,16 +304,16 @@ export function ConversationSimulator() {
                               onClick={() => setSelectedMessageId(
                                 selectedMessageId === message.id ? null : message.id
                               )}
-                              className="h-8 w-8 p-0 hover:bg-primary/10"
+                              className="h-6 w-6 p-0 hover:bg-primary/10"
                             >
-                              <Tag className="h-4 w-4" />
+                              <Tag className="h-3 w-3" />
                             </Button>
                           </div>
-                          <div className="bg-muted/50 rounded-xl p-4 border border-primary/10">
-                            <p className="text-base leading-relaxed">{message.content}</p>
+                          <div className="bg-muted/50 rounded-lg p-3 border border-primary/10">
+                            <p className="text-sm leading-relaxed">{message.content}</p>
                           </div>
                           {message.tags && message.tags.length > 0 && (
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex flex-wrap gap-1">
                               {message.tags.map((tag, index) => (
                                 <Badge
                                   key={index}
@@ -330,7 +332,7 @@ export function ConversationSimulator() {
                                 placeholder="Add tag..."
                                 value={messageTag}
                                 onChange={(e) => setMessageTag(e.target.value)}
-                                className="text-sm h-10 border-primary/30"
+                                className="text-sm h-8 border-primary/30 flex-1"
                                 onKeyPress={(e) => {
                                   if (e.key === "Enter" && messageTag.trim()) {
                                     addTagToMessage(message.id, messageTag.trim());
@@ -344,7 +346,7 @@ export function ConversationSimulator() {
                                     addTagToMessage(message.id, messageTag.trim());
                                   }
                                 }}
-                                className="bg-primary hover:bg-primary/90"
+                                className="h-8 bg-primary hover:bg-primary/90"
                               >
                                 Add
                               </Button>
@@ -357,20 +359,20 @@ export function ConversationSimulator() {
                 </div>
               </ScrollArea>
 
-              {/* Input Controls */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <Label className="flex items-center gap-2 text-base font-semibold">
-                    <User className="h-5 w-5" />
+              {/* Compact Input Controls */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2 text-sm font-medium">
+                    <User className="h-4 w-4" />
                     Customer Message
                   </Label>
-                  <div className="flex gap-3">
+                  <div className="flex gap-2">
                     <Textarea
                       value={userInput}
                       onChange={(e) => setUserInput(e.target.value)}
                       placeholder="I'm interested but the price seems high..."
-                      rows={4}
-                      className="text-base border-2 border-primary/30 focus:border-primary"
+                      rows={3}
+                      className="text-sm border border-primary/30 focus:border-primary flex-1"
                       onKeyPress={(e) => {
                         if (e.key === "Enter" && !e.shiftKey) {
                           e.preventDefault();
@@ -378,25 +380,25 @@ export function ConversationSimulator() {
                         }
                       }}
                     />
-                    <Button onClick={sendUserMessage} className="self-end h-12 w-12 bg-primary hover:bg-primary/90">
-                      <Send className="h-5 w-5" />
+                    <Button onClick={sendUserMessage} className="self-end h-10 w-10 bg-primary hover:bg-primary/90 flex-shrink-0">
+                      <Send className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
 
-                <div className="space-y-3">
-                  <Label className="flex items-center gap-2 text-base font-semibold">
-                    <Bot className="h-5 w-5" />
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2 text-sm font-medium">
+                    <Bot className="h-4 w-4" />
                     Assistant Response {!isManualMode && "(AI Generated)"}
                   </Label>
-                  <div className="flex gap-3">
+                  <div className="flex gap-2">
                     <Textarea
                       value={botInput}
                       onChange={(e) => setBotInput(e.target.value)}
                       placeholder="I understand your concern. Let me see what I can do..."
-                      rows={4}
+                      rows={3}
                       disabled={!isManualMode}
-                      className="text-base border-2 border-primary/30 focus:border-primary disabled:opacity-50"
+                      className="text-sm border border-primary/30 focus:border-primary disabled:opacity-50 flex-1"
                       onKeyPress={(e) => {
                         if (e.key === "Enter" && !e.shiftKey) {
                           e.preventDefault();
@@ -406,10 +408,10 @@ export function ConversationSimulator() {
                     />
                     <Button 
                       onClick={sendBotMessage} 
-                      className="self-end h-12 w-12 bg-primary hover:bg-primary/90" 
+                      className="self-end h-10 w-10 bg-primary hover:bg-primary/90 flex-shrink-0" 
                       disabled={!isManualMode}
                     >
-                      <Send className="h-5 w-5" />
+                      <Send className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>

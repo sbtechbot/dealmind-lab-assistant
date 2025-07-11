@@ -32,16 +32,16 @@ export function AppSidebar({ activeView, onViewChange }: AppSidebarProps) {
   const collapsed = state === "collapsed";
 
   return (
-    <Sidebar className={collapsed ? "w-16" : "w-80"} collapsible="icon">
-      <div className="p-6 border-b border-border bg-gradient-to-r from-primary/5 to-primary/10">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-primary/10">
-            <Brain className="h-6 w-6 text-primary" />
+    <Sidebar className={collapsed ? "w-16" : "w-72"} collapsible="icon">
+      <div className={`p-4 border-b border-border bg-gradient-to-r from-primary/5 to-primary/10 ${collapsed ? "px-2" : "px-4"}`}>
+        <div className="flex items-center gap-2">
+          <div className="p-2 rounded-lg bg-primary/10 flex-shrink-0">
+            <Brain className="h-5 w-5 text-primary" />
           </div>
           {!collapsed && (
-            <div className="animate-fade-in">
-              <h1 className="font-bold text-xl text-primary">DealMind Lab</h1>
-              <p className="text-sm text-muted-foreground">AI Negotiation Training</p>
+            <div className="animate-fade-in min-w-0">
+              <h1 className="font-bold text-lg text-primary truncate">DealMind Lab</h1>
+              <p className="text-xs text-muted-foreground truncate">AI Negotiation Training</p>
             </div>
           )}
         </div>
@@ -49,32 +49,33 @@ export function AppSidebar({ activeView, onViewChange }: AppSidebarProps) {
 
       <SidebarContent className="bg-background">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-base font-semibold text-primary px-6 py-4 uppercase tracking-wide">
-            Tools
+          <SidebarGroupLabel className={`text-sm font-semibold text-primary uppercase tracking-wide ${collapsed ? "px-2 py-3" : "px-4 py-3"}`}>
+            {collapsed ? "T" : "Tools"}
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-1 px-4">
+            <SidebarMenu className={`space-y-1 ${collapsed ? "px-1" : "px-3"}`}>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton
                     onClick={() => onViewChange(item.id)}
                     className={`${
                       activeView === item.id 
-                        ? "bg-primary text-primary-foreground shadow-lg border-l-4 border-primary scale-105" 
-                        : "hover:bg-primary/10 hover:border-l-4 hover:border-primary/30 hover:scale-102"
-                    } p-4 rounded-lg transition-all duration-200 ease-out min-h-[4rem] group card-hover`}
+                        ? "bg-primary text-primary-foreground shadow-md border-l-4 border-primary" 
+                        : "hover:bg-primary/10 hover:border-l-4 hover:border-primary/30"
+                    } ${collapsed ? "p-2 justify-center min-h-[3rem]" : "p-3 min-h-[3.5rem]"} rounded-lg transition-all duration-200 ease-out group card-hover`}
+                    title={collapsed ? item.title : undefined}
                   >
-                    <div className={`p-2 rounded-md ${
+                    <div className={`p-1.5 rounded-md ${
                       activeView === item.id 
                         ? "bg-primary-foreground/20" 
                         : "bg-primary/10 group-hover:bg-primary/20"
-                    } transition-colors duration-200`}>
-                      <item.icon className="h-5 w-5 flex-shrink-0" />
+                    } transition-colors duration-200 flex-shrink-0`}>
+                      <item.icon className="h-4 w-4" />
                     </div>
                     {!collapsed && (
-                      <div className="flex flex-col items-start ml-3 flex-1">
-                        <span className="text-sm font-semibold leading-tight">{item.title}</span>
-                        <span className="text-xs opacity-80 mt-1 leading-tight">{item.description}</span>
+                      <div className="flex flex-col items-start ml-2 flex-1 min-w-0">
+                        <span className="text-sm font-semibold leading-tight truncate w-full">{item.title}</span>
+                        <span className="text-xs opacity-80 mt-0.5 leading-tight truncate w-full">{item.description}</span>
                       </div>
                     )}
                   </SidebarMenuButton>
@@ -85,8 +86,8 @@ export function AppSidebar({ activeView, onViewChange }: AppSidebarProps) {
         </SidebarGroup>
       </SidebarContent>
       
-      <div className="p-4 border-t border-border bg-gradient-to-r from-primary/5 to-primary/10">
-        <SidebarTrigger className="w-full p-3 rounded-lg border border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-200 font-medium shadow-sm hover:shadow-md" />
+      <div className={`border-t border-border bg-gradient-to-r from-primary/5 to-primary/10 ${collapsed ? "p-2" : "p-3"}`}>
+        <SidebarTrigger className={`w-full rounded-lg border border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-200 font-medium shadow-sm hover:shadow-md ${collapsed ? "p-2 h-10" : "p-2.5 h-12"}`} />
       </div>
     </Sidebar>
   );
